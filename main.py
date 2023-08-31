@@ -16,16 +16,20 @@ class Report:
 
         :return:
         """
-        response_users: Response = requests.get("https://json.medrocket.ru/users", timeout=120)
-        response_tasks: Response = requests.get("https://json.medrocket.ru/todos", timeout=120)
-        if response_users.status_code == 200 and response_tasks.status_code == 200:
+        try:
+            response_users: Response = requests.get("https://json.medrocket.ru/users", timeout=120)
+            response_tasks: Response = requests.get("https://json.medrocket.ru/todos", timeout=120)
+            response_users.raise_for_status()
+            response_tasks.raise_for_status()
+
             self.logger.info("Data received successfully")
             data_users: List[dict] = response_users.json()
             data_tasks: List[dict] = response_tasks.json()
             self.parse_all_data(data_users, data_tasks)
-        else:
-            self.logger.error(f"No data was received. Response users code is {response_users.status_code} "
-                              f"and Response tasks code is {response_tasks.status_code}")
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"An error occurred during the API request: {str(e)}")
+        except Exception as e:
+            self.logger.error(f"An error occurred: {str(e)}")
 
     def parse_all_data(self, data_users: List[dict], data_tasks: List[dict]) -> None:
         """
@@ -97,9 +101,8 @@ class Report:
         """
         self.logger.info(f"Will write a list of '{name}' tasks in a paragraph")
         tasks_str: str = f"## {name} задачи ({actual_count_tasks}):\n"
-        for task in tasks:
-            tasks_str += f"- {task}\n"
-        return f"{tasks_str}\n"
+        tasks_str += "\n".join(f"- {task}" for task in tasks)
+        return f"{tasks_str}\n\n"
 
     def write_to_file(self, filename: str, content: str) -> None:
         """
@@ -108,12 +111,11 @@ class Report:
         :param content:
         :return:
         """
-        fle: Path = Path(filename)
-        if not os.path.exists(os.path.dirname(fle)):
-            os.makedirs(os.path.dirname(fle))
-        with open(filename, 'w') as file:
+        fle = Path(filename)
+        fle.parent.mkdir(parents=True, exist_ok=True)
+        with fle.open('w') as file:
             file.write(content)
-            self.logger.info(f"The data on the file {os.path.basename(filename)} was recorded successfully")
+            self.logger.info(f"The data on the file {fle.name} was recorded successfully")
 
 
 if __name__ == '__main__':
