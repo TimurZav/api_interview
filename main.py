@@ -16,8 +16,8 @@ class Report:
 
         :return:
         """
-        response_users: Response = requests.get("https://json.medrocket.ru/users")
-        response_tasks: Response = requests.get("https://json.medrocket.ru/todos")
+        response_users: Response = requests.get("https://json.medrocket.ru/users", timeout=120)
+        response_tasks: Response = requests.get("https://json.medrocket.ru/todos", timeout=120)
         if response_users.status_code == 200 and response_tasks.status_code == 200:
             self.logger.info("Data received successfully")
             data_users: List[dict] = response_users.json()
@@ -83,7 +83,7 @@ class Report:
         :return:
         """
         self.logger.info("Will record the user's personal data in the paragraph")
-        return f"# Отчёт для {user.get('company', {}).get('name', None)}.\n" \
+        return f"# Отчёт для {user.get('company', {}).get('name')}.\n" \
                f"{user.get('name')} <{user.get('email')}> {datetime.now():{DATE_FTM}}\n" \
                f"Всего задач: {total_count_tasks}\n\n"
 
