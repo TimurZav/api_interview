@@ -76,7 +76,7 @@ class Report:
                     dict_tasks["actual_count_tasks"] += 1
                     dict_tasks["actual_tasks"].append(task.get("title"))
                 dict_tasks["total_count_tasks"] += 1
-        self.logger.info("Tasks were successfully counted and received")
+        self.logger.info(f"Tasks for user '{user.get('username')}' were successfully counted and received")
         return dict_tasks
 
     def parse_personal_data(self, user: dict, total_count_tasks: int) -> str:
