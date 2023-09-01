@@ -28,10 +28,10 @@ class Report:
             self.parse_all_data(users, tasks)
         except requests.exceptions.RequestException as e:
             self.logger.error(f"An error occurred during the API request: {str(e)}")
-            raise SystemExit(e)
+            raise SystemExit(e) from e
         except Exception as e:
             self.logger.error(f"An error occurred: {str(e)}")
-            raise SystemExit(e)
+            raise SystemExit(e) from e
 
     def parse_all_data(self, users: List[dict], tasks: List[dict]) -> None:
         """
