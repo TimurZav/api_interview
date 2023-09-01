@@ -1,9 +1,9 @@
 import re
 import requests
-from __init__ import *
 from typing import List
 from requests import Response
 from datetime import datetime
+from __init__ import DATE_FTM, get_logger, getLogger, os
 
 
 class Report:
