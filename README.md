@@ -8,7 +8,7 @@ This is a program that receives task lists from different users and writes them 
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install libraries for this program.
 
-```console
+```sh
 $ git clone https://github.com/TimurZav/api_interview.git
 
 $ cd api_interview
