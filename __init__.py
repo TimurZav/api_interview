@@ -8,11 +8,6 @@ DATE_FTM: str = "%d.%m.%Y %H:%M"
 MAX_FILE_SIZE: int = 1024 * 1024  # 1 МБ
 MAX_FILES: int = 3
 
-DICT_URLS: dict = {
-    "users": "https://json.medrocket.ru/users",
-    "tasks": "https://json.medrocket.ru/todos"
-}
-
 
 def get_file_handler(name: str) -> RotatingFileHandler:
     log_dir_name: str = "logging"

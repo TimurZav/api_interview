@@ -23,23 +23,23 @@ class Report:
             response_tasks.raise_for_status()
 
             self.logger.info("Data received successfully")
-            data_users: List[dict] = response_users.json()
-            data_tasks: List[dict] = response_tasks.json()
-            self.parse_all_data(data_users, data_tasks)
+            users: List[dict] = response_users.json()
+            tasks: List[dict] = response_tasks.json()
+            self.parse_all_data(users, tasks)
         except requests.exceptions.RequestException as e:
             self.logger.error(f"An error occurred during the API request: {str(e)}")
         except Exception as e:
             self.logger.error(f"An error occurred: {str(e)}")
 
-    def parse_all_data(self, data_users: List[dict], data_tasks: List[dict]) -> None:
+    def parse_all_data(self, users: List[dict], tasks: List[dict]) -> None:
         """
 
-        :param data_users:
-        :param data_tasks:
+        :param users:
+        :param tasks:
         :return:
         """
-        for user in data_users:
-            dict_tasks: dict = self.get_data_and_count_tasks(data_tasks, user)
+        for user in users:
+            dict_tasks: dict = self.get_data_and_count_tasks(tasks, user)
             personal_data: str = self.parse_personal_data(user, dict_tasks["total_count_tasks"])
             actual_tasks: str = self.parse_tasks(
                 dict_tasks["actual_tasks"],
@@ -53,10 +53,10 @@ class Report:
             )
             self.write_to_file(f"tasks/{user.get('username')}.txt", f"{personal_data}{actual_tasks}{completed_tasks}")
 
-    def get_data_and_count_tasks(self, data_tasks: List[dict], user: dict) -> dict:
+    def get_data_and_count_tasks(self, tasks: List[dict], user: dict) -> dict:
         """
 
-        :param data_tasks:
+        :param tasks:
         :param user:
         :return:
         """
@@ -67,7 +67,7 @@ class Report:
             "actual_tasks": [],
             "completed_tasks": []
         }
-        for task in data_tasks:
+        for task in tasks:
             if task.get("userId") == user.get("id"):
                 if task.get("completed"):
                     dict_tasks["completed_count_tasks"] += 1
