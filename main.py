@@ -39,7 +39,7 @@ class Report:
         :return:
         """
         for user in users:
-            dict_tasks: dict = self.get_data_and_count_tasks(tasks, user)
+            dict_tasks: dict = self._get_data_and_count_tasks(tasks, user)
             personal_data: str = self.parse_personal_data(user, dict_tasks["total_count_tasks"])
             actual_tasks: str = self.parse_tasks(
                 dict_tasks["actual_tasks"],
@@ -53,7 +53,7 @@ class Report:
             )
             self.write_to_file(f"tasks/{user.get('username')}.txt", f"{personal_data}{actual_tasks}{completed_tasks}")
 
-    def get_data_and_count_tasks(self, tasks: List[dict], user: dict) -> dict:
+    def _get_data_and_count_tasks(self, tasks: List[dict], user: dict) -> dict:
         """
 
         :param tasks:
@@ -104,7 +104,7 @@ class Report:
         tasks_str += "\n".join(f"- {task}" if len(task) < 46 else f"- {task[:46]}..." for task in tasks)
         return f"{tasks_str}\n\n"
 
-    def get_date_from_file_content(self, content: str) -> str:
+    def _get_date_from_file_content(self, content: str) -> str:
         """
 
         :param content:
@@ -125,7 +125,7 @@ class Report:
         """
         self.logger.info(f"The file {os.path.basename(filename)} exists, so rename other files")
         with open(filename, "r") as file:
-            date: str = self.get_date_from_file_content(file.read())
+            date: str = self._get_date_from_file_content(file.read())
             os.rename(
                 filename,
                 f"{dir_name}/"
