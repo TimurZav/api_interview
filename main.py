@@ -13,7 +13,7 @@ class Report:
 
     def get_data_by_api(self) -> None:
         """
-
+        Getting data from the REST API. If errors occur, we record them in the logs.
         :return:
         """
         try:
@@ -33,9 +33,9 @@ class Report:
 
     def parse_all_data(self, users: List[dict], tasks: List[dict]) -> None:
         """
-
-        :param users:
-        :param tasks:
+        Getting all the users data and their tasks and then write them to files.
+        :param users: List of users with their personal information.
+        :param tasks: The list of tasks of these users.
         :return:
         """
         for user in users:
@@ -55,10 +55,10 @@ class Report:
 
     def _get_data_and_count_tasks(self, tasks: List[dict], user: dict) -> dict:
         """
-
-        :param tasks:
-        :param user:
-        :return:
+        Getting actual and completed tasks, as well as their number and total number.
+        :param tasks: The list of tasks of these users.
+        :param user: Current user from list.
+        :return: A dictionary with a number and a list of tasks.
         """
         dict_tasks: dict = {
             "total_count_tasks": 0,
@@ -81,51 +81,52 @@ class Report:
 
     def parse_personal_data(self, user: dict, total_count_tasks: int) -> str:
         """
-
-        :param user:
-        :param total_count_tasks:
-        :return:
+        Receive personal data on the user with the total number of tasks.
+        :param user: Current user from list.
+        :param total_count_tasks: Total number of tasks.
+        :return: A paragraph with personal data.
         """
         self.logger.info("Will record the user's personal data in the paragraph")
         return f"# Отчёт для {user.get('company', {}).get('name')}.\n" \
                f"{user.get('name')} <{user.get('email')}> {datetime.now():{DATE_FTM}}\n" \
                f"Всего задач: {total_count_tasks}\n\n"
 
-    def parse_tasks(self, tasks: list, name: str, actual_count_tasks: int) -> str:
+    def parse_tasks(self, tasks: list, name: str, count_tasks: int) -> str:
         """
-
-        :param tasks:
-        :param name:
-        :param actual_count_tasks:
-        :return:
+        Get user tasks (actual or completed) with their number.
+        :param tasks: The list of tasks of these users.
+        :param name: Actual or Completed tasks.
+        :param count_tasks: Number of tasks.
+        :return: A paragraph with tasks.
         """
         self.logger.info(f"Will write a list of '{name}' tasks in a paragraph")
-        tasks_str: str = f"## {name} задачи ({actual_count_tasks}):\n"
+        tasks_str: str = f"## {name} задачи ({count_tasks}):\n"
         tasks_str += "\n".join(f"- {task}" if len(task) < 46 else f"- {task[:46]}..." for task in tasks)
         return f"{tasks_str}\n\n"
 
-    def _get_date_from_file_content(self, content: str) -> str:
+    def _get_date_from_file_content(self, filename: str, content: str) -> str:
         """
-
-        :param content:
-        :return:
+        Getting the date from the file content to change the file name.
+        :param filename: Current name of file.
+        :param content: Content of current file.
+        :return: Date from file content.
         """
         self.logger.info("Get date in file content")
         if match := re.search(r"\d{2}[.]\d{2}[.]\d{4} \d{2}:\d{2}", content):
             return match.group()
-        else:
-            return datetime.now().strftime(DATE_FTM)
+        self.logger.error("Date not found in file content. Get the date from the last file change")
+        return datetime.fromtimestamp(os.path.getmtime(filename)).strftime(DATE_FTM)
 
-    def rename_old_files(self, filename: str, dir_name: str):
+    def rename_old_files(self, filename: str, dir_name: str) -> None:
         """
-
-        :param filename:
-        :param dir_name:
+        Rename the old files (substitute the prefix old and the date from the file).
+        :param filename: Current name of file.
+        :param dir_name: Name of directory.
         :return:
         """
         self.logger.info(f"The file {os.path.basename(filename)} exists, so rename other files")
         with open(filename, "r") as file:
-            date: str = self._get_date_from_file_content(file.read())
+            date: str = self._get_date_from_file_content(filename, file.read())
             os.rename(
                 filename,
                 f"{dir_name}/"
@@ -135,9 +136,9 @@ class Report:
 
     def write_to_file(self, filename: str, content: str) -> None:
         """
-
-        :param filename:
-        :param content:
+        Writing data to a file.
+        :param filename: Current name of file.
+        :param content: Content of current file.
         :return:
         """
         dir_name: str = os.path.dirname(filename)
