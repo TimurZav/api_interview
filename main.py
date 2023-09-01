@@ -114,9 +114,9 @@ class Report:
         if match := re.search(r"\d{2}[.]\d{2}[.]\d{4} \d{2}:\d{2}", content):
             return match.group()
         else:
-            return "Date not found in file content"
+            return datetime.now().strftime(DATE_FTM)
 
-    def rename_old_file(self, filename: str, dir_name: str):
+    def rename_old_files(self, filename: str, dir_name: str):
         """
 
         :param filename:
@@ -124,7 +124,7 @@ class Report:
         :return:
         """
         self.logger.info(f"The file {os.path.basename(filename)} exists, so rename other files")
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             date: str = self.get_date_from_file_content(file.read())
             os.rename(
                 filename,
@@ -143,11 +143,11 @@ class Report:
         dir_name: str = os.path.dirname(filename)
         os.makedirs(dir_name, exist_ok=True)
         if os.path.isfile(filename):
-            self.rename_old_file(filename, dir_name)
-        with open(filename, 'w') as file:
+            self.rename_old_files(filename, dir_name)
+        with open(filename, "w") as file:
             file.write(content)
             self.logger.info(f"The data on the file {os.path.basename(filename)} was recorded successfully")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     Report().get_data_by_api()
