@@ -1,4 +1,3 @@
-import re
 import requests
 from typing import List
 from requests import Response
@@ -106,36 +105,6 @@ class Report:
         tasks_str += "\n".join(f"- {task}" if len(task) < 46 else f"- {task[:46]}..." for task in tasks)
         return f"{tasks_str}\n\n"
 
-    def _get_date_from_file_content(self, filename: str, content: str) -> str:
-        """
-        Getting the date from the file content to change the file name.
-        :param filename: Current name of file.
-        :param content: Content of current file.
-        :return: Date from file content.
-        """
-        self.logger.info("Get date in file content")
-        if match := re.search(r"\d{2}[.]\d{2}[.]\d{4} \d{2}:\d{2}", content):
-            return match.group()
-        self.logger.error("Date not found in file content. Get the date from the last file change")
-        return datetime.fromtimestamp(os.path.getmtime(filename)).strftime(DATE_FTM)
-
-    def rename_old_files(self, filename: str, dir_name: str) -> None:
-        """
-        Rename the old files (substitute the prefix old and the date from the file).
-        :param filename: Current name of file.
-        :param dir_name: Name of directory.
-        :return:
-        """
-        self.logger.info(f"The file {os.path.basename(filename)} exists, so rename other files")
-        with open(filename, "r") as file:
-            date: str = self._get_date_from_file_content(filename, file.read())
-            os.rename(
-                filename,
-                f"{dir_name}/"
-                f"old_{os.path.basename(filename).replace('.txt', '')}_"
-                f"{datetime.strptime(date, DATE_FTM).strftime('%Y-%m-%dT%H:%M')}.txt"
-            )
-
     def write_to_file(self, filename: str, content: str) -> None:
         """
         Writing data to a file.
@@ -146,7 +115,13 @@ class Report:
         dir_name: str = os.path.dirname(filename)
         os.makedirs(dir_name, exist_ok=True)
         if os.path.isfile(filename):
-            self.rename_old_files(filename, dir_name)
+            self.logger.info(f"The file {os.path.basename(filename)} exists, so rename other files")
+            os.rename(
+                filename,
+                f"{dir_name}/"
+                f"old_{os.path.basename(filename).replace('.txt', '')}_"
+                f"{datetime.fromtimestamp(os.path.getmtime(filename)).strftime('%Y-%m-%dT%H:%M')}.txt"
+            )
         with open(filename, "w") as file:
             file.write(content)
             self.logger.info(f"The data on the file {os.path.basename(filename)} was recorded successfully")
