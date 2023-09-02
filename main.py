@@ -16,14 +16,14 @@ class Report:
         :return:
         """
         try:
-            response_users: Response = requests.get("https://json.medrocket.ru/users", timeout=120)
-            response_tasks: Response = requests.get("https://json.medrocket.ru/todos", timeout=120)
-            response_users.raise_for_status()
-            response_tasks.raise_for_status()
+            users_response: Response = requests.get("https://json.medrocket.ru/users", timeout=120)
+            tasks_response: Response = requests.get("https://json.medrocket.ru/todos", timeout=120)
+            users_response.raise_for_status()
+            tasks_response.raise_for_status()
 
             self.logger.info("Data received successfully")
-            users: List[dict] = response_users.json()
-            tasks: List[dict] = response_tasks.json()
+            users: List[dict] = users_response.json()
+            tasks: List[dict] = tasks_response.json()
             self.parse_all_data(users, tasks)
         except requests.exceptions.RequestException as e:
             self.logger.error(f"An error occurred during the API request: {str(e)}")

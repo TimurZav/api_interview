@@ -4,3 +4,5 @@ __pycache__
 venv
 logging
 tasks
+tests/test_logging
+tests/test_tasks
