@@ -1,6 +1,6 @@
 import os
-from logging import Formatter, getLogger, INFO
 from logging.handlers import RotatingFileHandler
+from logging import Formatter, getLogger, INFO, StreamHandler
 
 
 LOG_FORMAT: str = "[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s"
@@ -22,10 +22,15 @@ def get_file_handler(name: str) -> RotatingFileHandler:
     return file_handler
 
 
+def get_stream_handler():
+    stream_handler: StreamHandler = StreamHandler()
+    stream_handler.setFormatter(Formatter(LOG_FORMAT))
+    return stream_handler
+
+
 def get_logger(name: str) -> getLogger:
     logger: getLogger = getLogger(name)
-    if logger.hasHandlers():
-        logger.handlers.clear()
     logger.addHandler(get_file_handler(name))
+    logger.addHandler(get_stream_handler())
     logger.setLevel(INFO)
     return logger
